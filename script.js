@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const paymentInput = document.getElementById('payment'); 
     const notesTextarea = document.getElementById('notes');
 
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwFUtYMEihAUMKhNJSGeJvkWIPiJvXXMx6obggVK-dLHxP7f8NQYFH2l65FbWOyFbQ/exec';
+    const SCRIPT_URL = 'YOUR_DEPLOYED_WEB_APP_URL_HERE';
 
     let rooms = [];
 
@@ -51,12 +51,13 @@ document.addEventListener('DOMContentLoaded', () => {
             let roomInfo = `<h3>ห้อง ${room.roomNumber}</h3>
                             <p class="room-status">${room.status}</p>`;
 
-            // เปลี่ยนเงื่อนไขเพื่อแสดงชื่อลูกค้าเมื่อสถานะเป็น "จอง" หรือ "ไม่ว่าง"
+            // แสดงชื่อลูกค้าเมื่อสถานะเป็น "จอง" หรือ "ไม่ว่าง"
             if ((room.status === 'ไม่ว่าง' || room.status === 'จอง') && room.customerName) {
                 roomInfo += `<p class="room-owner">${room.customerName}</p>`;
             } 
-            // แสดงวันที่เมื่อสถานะเป็น "ว่าง"
-            else if (room.status === 'ว่าง' && room.date) {
+            
+            // เปลี่ยนเงื่อนไขใหม่: แสดงวันที่เมื่อสถานะเป็น "ว่าง" หรือ "จอง"
+            if ((room.status === 'ว่าง' || room.status === 'จอง') && room.date) {
                 const roomDate = new Date(room.date);
                 const formattedDate = roomDate.toLocaleDateString('th-TH', {
                     year: 'numeric',
