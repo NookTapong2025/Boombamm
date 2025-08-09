@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const paymentInput = document.getElementById('payment'); 
     const notesTextarea = document.getElementById('notes');
 
-    const SCRIPT_URL = 'YOUR_DEPLOYED_WEB_APP_URL_HERE';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwFUtYMEihAUMKhNJSGeJvkWIPiJvXXMx6obggVK-dLHxP7f8NQYFH2l65FbWOyFbQ/exec';
 
     let rooms = [];
 
@@ -189,3 +189,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     fetchRooms();
 });
+
