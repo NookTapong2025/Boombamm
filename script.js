@@ -11,9 +11,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const statusSelect = document.getElementById('status');
     const customerNameInput = document.getElementById('customerName');
     const phoneNumberInput = document.getElementById('phoneNumber');
+    const dateInput = document.getElementById('date');
+    const paymentInput = document.getElementById('payment'); 
     const notesTextarea = document.getElementById('notes');
 
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwHmJAUlI1aS5dFBwUWw3Cfqy4c8qE8QaHlxJh2tJsKpQWZmhNyUoTmWSKjhNDO2LAWfQ/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwFUtYMEihAUMKhNJSGeJvkWIPiJvXXMx6obggVK-dLHxP7f8NQYFH2l65FbWOyFbQ/exec';
 
     let rooms = [];
 
@@ -28,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 customerName: item['ชื่อลูกค้า'],
                 phoneNumber: item['เบอร์โทรศัพท์'],
                 date: item['วันที่'],
+                payment: item['จำนวนเงิน'],
                 notes: item['หมายเหตุ']
             }));
 
@@ -48,9 +51,11 @@ document.addEventListener('DOMContentLoaded', () => {
             let roomInfo = `<h3>ห้อง ${room.roomNumber}</h3>
                             <p class="room-status">${room.status}</p>`;
 
-            if (room.status === 'ไม่ว่าง' && room.customerName) {
+            // เปลี่ยนเงื่อนไขเพื่อแสดงชื่อลูกค้าเมื่อสถานะเป็น "จอง" หรือ "ไม่ว่าง"
+            if ((room.status === 'ไม่ว่าง' || room.status === 'จอง') && room.customerName) {
                 roomInfo += `<p class="room-owner">${room.customerName}</p>`;
             } 
+            // แสดงวันที่เมื่อสถานะเป็น "ว่าง"
             else if (room.status === 'ว่าง' && room.date) {
                 const roomDate = new Date(room.date);
                 const formattedDate = roomDate.toLocaleDateString('th-TH', {
@@ -59,6 +64,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     day: '2-digit'
                 }).replace(/\//g, '-');
                 roomInfo += `<p class="room-date">${formattedDate}</p>`;
+            }
+
+            // แสดงจำนวนเงินเมื่อสถานะเป็น "จอง" หรือ "ไม่ว่าง"
+            if ((room.status === 'จอง' || room.status === 'ไม่ว่าง') && room.payment) {
+                roomInfo += `<p class="room-payment">฿ ${room.payment}</p>`;
             }
 
             roomDiv.innerHTML = roomInfo;
@@ -78,7 +88,8 @@ document.addEventListener('DOMContentLoaded', () => {
         statusSelect.value = room.status;
         customerNameInput.value = room.customerName;
         phoneNumberInput.value = room.phoneNumber;
-        document.getElementById('date').value = room.date;
+        dateInput.value = room.date;
+        paymentInput.value = room.payment;
         notesTextarea.value = room.notes;
 
         function toggleInputStatus() {
@@ -89,6 +100,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 phoneNumberInput.value = '';
                 phoneNumberInput.disabled = true;
                 phoneNumberInput.classList.add('disabled-input');
+                paymentInput.value = '';
+                paymentInput.disabled = true;
+                paymentInput.classList.add('disabled-input');
                 notesTextarea.value = '';
                 notesTextarea.disabled = true;
                 notesTextarea.classList.add('disabled-input');
@@ -97,6 +111,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 customerNameInput.classList.remove('disabled-input');
                 phoneNumberInput.disabled = false;
                 phoneNumberInput.classList.remove('disabled-input');
+                paymentInput.disabled = false;
+                paymentInput.classList.remove('disabled-input');
                 notesTextarea.disabled = false;
                 notesTextarea.classList.remove('disabled-input');
             }
@@ -121,14 +137,21 @@ document.addEventListener('DOMContentLoaded', () => {
     roomForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         
+        const originalButtonText = submitButton.textContent;
+        const originalButtonColor = submitButton.style.backgroundColor;
+        
+        submitButton.textContent = 'กำลังบันทึกข้อมูล';
+        submitButton.style.backgroundColor = 'red';
+        submitButton.disabled = true;
         submitButton.classList.add('blinking');
 
-        const roomNumber = document.getElementById('roomNumberInput').value;
-        const customerName = document.getElementById('customerName').value;
-        const phoneNumber = document.getElementById('phoneNumber').value;
-        const status = document.getElementById('status').value;
-        const date = document.getElementById('date').value;
-        const notes = document.getElementById('notes').value;
+        const roomNumber = roomNumberInput.value;
+        const customerName = customerNameInput.value;
+        const phoneNumber = phoneNumberInput.value;
+        const status = statusSelect.value;
+        const date = dateInput.value;
+        const payment = paymentInput.value;
+        const notes = notesTextarea.value;
         
         const formData = new FormData();
         formData.append('หมายเลขห้อง', roomNumber);
@@ -136,6 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('เบอร์โทรศัพท์', phoneNumber);
         formData.append('สถานะห้อง', status);
         formData.append('วันที่', date);
+        formData.append('จำนวนเงิน', payment);
         formData.append('หมายเหตุ', notes);
 
         try {
@@ -155,6 +179,9 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('เกิดข้อผิดพลาดในการบันทึกข้อมูล:', error);
             alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล!');
         } finally {
+            submitButton.textContent = originalButtonText;
+            submitButton.style.backgroundColor = originalButtonColor;
+            submitButton.disabled = false;
             submitButton.classList.remove('blinking');
         }
     });
