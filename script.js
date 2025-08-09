@@ -189,4 +189,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
     fetchRooms();
 });
-
