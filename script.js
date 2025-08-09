@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const statusSelect = document.getElementById('status');
     const customerNameInput = document.getElementById('customerName');
+    const nicknameInput = document.getElementById('nickname'); 
+    const idNumberInput = document.getElementById('idNumber'); 
     const phoneNumberInput = document.getElementById('phoneNumber');
     const dateInput = document.getElementById('date');
     const paymentInput = document.getElementById('payment'); 
@@ -28,6 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 roomNumber: item['หมายเลขห้อง'],
                 status: item['สถานะห้อง'],
                 customerName: item['ชื่อลูกค้า'],
+                nickname: item['ชื่อเล่น'],
+                idNumber: item['เลขที่บัตรประชาชน'],
                 phoneNumber: item['เบอร์โทรศัพท์'],
                 date: item['วันที่'],
                 payment: item['จำนวนเงิน'],
@@ -56,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 roomInfo += `<p class="room-owner">${room.customerName}</p>`;
             } 
             
-            // เปลี่ยนเงื่อนไขใหม่: แสดงวันที่เมื่อสถานะเป็น "ว่าง" หรือ "จอง"
+            // แสดงวันที่เมื่อสถานะเป็น "ว่าง" หรือ "จอง"
             if ((room.status === 'ว่าง' || room.status === 'จอง') && room.date) {
                 const roomDate = new Date(room.date);
                 const formattedDate = roomDate.toLocaleDateString('th-TH', {
@@ -88,8 +92,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
         statusSelect.value = room.status;
         customerNameInput.value = room.customerName;
+        nicknameInput.value = room.nickname;
+        idNumberInput.value = room.idNumber;
         phoneNumberInput.value = room.phoneNumber;
-        dateInput.value = room.date;
+
+        // แก้ไข: ตรวจสอบและแปลงรูปแบบวันที่ให้ถูกต้อง
+        if (room.date) {
+            const date = new Date(room.date);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            dateInput.value = `${year}-${month}-${day}`;
+        } else {
+            dateInput.value = '';
+        }
+        
         paymentInput.value = room.payment;
         notesTextarea.value = room.notes;
 
@@ -98,6 +115,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 customerNameInput.value = '';
                 customerNameInput.disabled = true;
                 customerNameInput.classList.add('disabled-input');
+                nicknameInput.value = '';
+                nicknameInput.disabled = true;
+                nicknameInput.classList.add('disabled-input');
+                idNumberInput.value = '';
+                idNumberInput.disabled = true;
+                idNumberInput.classList.add('disabled-input');
                 phoneNumberInput.value = '';
                 phoneNumberInput.disabled = true;
                 phoneNumberInput.classList.add('disabled-input');
@@ -110,6 +133,10 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 customerNameInput.disabled = false;
                 customerNameInput.classList.remove('disabled-input');
+                nicknameInput.disabled = false;
+                nicknameInput.classList.remove('disabled-input');
+                idNumberInput.disabled = false;
+                idNumberInput.classList.remove('disabled-input');
                 phoneNumberInput.disabled = false;
                 phoneNumberInput.classList.remove('disabled-input');
                 paymentInput.disabled = false;
@@ -148,6 +175,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const roomNumber = roomNumberInput.value;
         const customerName = customerNameInput.value;
+        const nickname = nicknameInput.value;
+        const idNumber = idNumberInput.value;
         const phoneNumber = phoneNumberInput.value;
         const status = statusSelect.value;
         const date = dateInput.value;
@@ -157,6 +186,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const formData = new FormData();
         formData.append('หมายเลขห้อง', roomNumber);
         formData.append('ชื่อลูกค้า', customerName);
+        formData.append('ชื่อเล่น', nickname);
+        formData.append('เลขที่บัตรประชาชน', idNumber);
         formData.append('เบอร์โทรศัพท์', phoneNumber);
         formData.append('สถานะห้อง', status);
         formData.append('วันที่', date);
